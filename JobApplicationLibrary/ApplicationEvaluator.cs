@@ -13,11 +13,11 @@ namespace JobApplicationLibrary
         private const int minAge = 18;
         private const int autoAcceptedYearOfExperience = 15;
         private List<string> techStackList = new() { "C#", "RabbitMQ","MicroService","Visual Studio"};
-        private IdentityValidator identityValidator;
+       private readonly IIdentityValidator validator;
 
-        public ApplicationEvaluator()
+        public ApplicationEvaluator(IIdentityValidator identityValidator )
         {
-            identityValidator = new IdentityValidator();        
+            validator = identityValidator ;        
         }
 
         public ApplicationResult Evaluate(JobApplication form)
@@ -25,7 +25,7 @@ namespace JobApplicationLibrary
             if (form.Applicant.Age < minAge)
                 return ApplicationResult.AutoRejected;
 
-            var validIdentity = identityValidator.IsValid(form.Applicant.IdentityNumber);
+            var validIdentity = validator.IsValid(form.Applicant.IdentityNumber);
 
             if (!validIdentity)
                 return ApplicationResult.TransferredToHR;
@@ -49,7 +49,6 @@ namespace JobApplicationLibrary
                 .Count();
             return (int) ((double)matchedCount / techStackList.Count) * 100;
         }
-
         public enum ApplicationResult
         {
             AutoRejected,
